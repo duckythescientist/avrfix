@@ -47,19 +47,19 @@ typedef struct {
 #define ul(x) ((unsigned long)(x))
 #define sl(x) ((signed long)(x))
 
-extern void cordicck(_Accum* x, _Accum* y, _Accum* z, uint8_t iterations, uint8_t mode);
-extern void cordichk(_Accum* x, _Accum* y, _Accum* z, uint8_t iterations, uint8_t mode);
-extern void cordiccsk(_sAccum* x, _sAccum* y, _sAccum* z, uint8_t mode);
-extern void cordichsk(_sAccum* x, _sAccum* y, _sAccum* z, uint8_t mode);
+extern void cordicck(fix_t* x, fix_t* y, fix_t* z, uint8_t iterations, uint8_t mode);
+extern void cordichk(fix_t* x, fix_t* y, fix_t* z, uint8_t iterations, uint8_t mode);
+extern void cordiccsk(sfix_t* x, sfix_t* y, sfix_t* z, uint8_t mode);
+extern void cordichsk(sfix_t* x, sfix_t* y, sfix_t* z, uint8_t mode);
 
 #ifdef SMULSKD
-_sAccum smulskD(_sAccum x, _sAccum y)
+sfix_t smulskD(sfix_t x, sfix_t y)
 {
   return ss(RSHIFT_static(sl(x)*sl(y), SACCUM_FBIT));
 }
 #endif
 #ifdef SMULSKS
-_sAccum smulskS(_sAccum x, _sAccum y)
+sfix_t smulskS(sfix_t x, sfix_t y)
 {
   long mul = RSHIFT_static(sl(x)*sl(y), SACCUM_FBIT);
   if(mul >= 0) {
@@ -73,7 +73,7 @@ _sAccum smulskS(_sAccum x, _sAccum y)
 }
 #endif
 #ifdef MULKD
-_Accum mulkD(_Accum x, _Accum y)
+fix_t mulkD(fix_t x, fix_t y)
 {
 #if BYTE_ORDER == BIG_ENDIAN
 #  define LO 0
@@ -86,10 +86,10 @@ _Accum mulkD(_Accum x, _Accum y)
   unsigned short ys[2];
   int8_t positive = ((x < 0 && y < 0) || (y > 0 && x > 0)) ? 1 : 0;
   y = absk(y);
-  *((_Accum*)xs) = absk(x);
-  *((_Accum*)ys) = y;
+  *((fix_t*)xs) = absk(x);
+  *((fix_t*)ys) = y;
   x = sl(xs[HI])*y + sl(xs[LO])*ys[HI];
-  *((_Accum*)xs) = ul(xs[LO])*ul(ys[LO]);
+  *((fix_t*)xs) = ul(xs[LO])*ul(ys[LO]);
   if(positive)
      return x + us(xs[HI]);
   else
@@ -99,7 +99,7 @@ _Accum mulkD(_Accum x, _Accum y)
 }
 #endif
 #ifdef MULKS
-_Accum mulkS(_Accum x, _Accum y)
+fix_t mulkS(fix_t x, fix_t y)
 {
 #if BYTE_ORDER == BIG_ENDIAN
 #  define LO 0
@@ -112,8 +112,8 @@ _Accum mulkS(_Accum x, _Accum y)
   unsigned short ys[2];
   unsigned long mul;
   int8_t positive = ((x < 0 && y < 0) || (y > 0 && x > 0)) ? 1 : 0;
-  *((_Accum*)xs) = absk(x);
-  *((_Accum*)ys) = absk(y);
+  *((fix_t*)xs) = absk(x);
+  *((fix_t*)ys) = absk(y);
   mul = ul(xs[HI]) * ul(ys[HI]);
   if(mul > 32767)
      return (positive ? ACCUM_MAX : ACCUM_MIN);
@@ -129,9 +129,8 @@ _Accum mulkS(_Accum x, _Accum y)
 }
 #endif
 #ifdef LMULLKD
-_lAccum lmullkD(_lAccum x, _lAccum y)
+lfix_t lmullkD(lfix_t x, lfix_t y)
 {
-  #pragma message "lmullkD is being compiled"
   lAccum_container *xc, *yc;
   xc = (lAccum_container*)&x;
   yc = (lAccum_container*)&y;
@@ -143,15 +142,15 @@ _lAccum lmullkD(_lAccum x, _lAccum y)
 }
 #endif
 #ifdef LMULLKS
-_lAccum lmullkS(_lAccum x, _lAccum y)
+lfix_t lmullkS(lfix_t x, lfix_t y)
 {
   lAccum_container xc, yc;
   unsigned long mul;
   int8_t positive = ((x < 0 && y < 0) || (y > 0 && x > 0)) ? 1 : 0;
   x = labslk(x);
   y = labslk(y);
-  *((_lAccum*)&xc) = x;
-  *((_lAccum*)&yc) = y;
+  *((lfix_t*)&xc) = x;
+  *((lfix_t*)&yc) = y;
   mul = xc.h * yc.h;
   x &= 0x00FFFFFF;
   y &= 0x00FFFFFF;
@@ -168,13 +167,13 @@ _lAccum lmullkS(_lAccum x, _lAccum y)
 }
 #endif
 #ifdef SDIVSKD
-_sAccum sdivskD(_sAccum x, _sAccum y)
+sfix_t sdivskD(sfix_t x, sfix_t y)
 {
   return ss((sl(x) << SACCUM_FBIT) / y);
 }
 #endif
 #ifdef SDIVSKS
-_sAccum sdivskS(_sAccum x, _sAccum y)
+sfix_t sdivskS(sfix_t x, sfix_t y)
 {
   long div;
   if(y == 0)
@@ -192,8 +191,8 @@ _sAccum sdivskS(_sAccum x, _sAccum y)
 #endif
 #ifdef DIVKD
 /* if y = 0, divkD will enter an endless loop */
-_Accum divkD(_Accum x, _Accum y) {
-  _Accum result;
+fix_t divkD(fix_t x, fix_t y) {
+  fix_t result;
   int i,j=0;
   int8_t sign = ((x < 0 && y < 0) || (x > 0 && y > 0)) ? 1 : 0;
   x = absk(x);
@@ -205,7 +204,7 @@ _Accum divkD(_Accum x, _Accum y) {
     if (x >= ACCUM_MAX / 2) break;
     x = LSHIFT_static(x, 1);
   }
-  while((y & 1) == 0) {
+  while((ul(y) & 1) == 0) {
     y = RSHIFT_static(y, 1);
     j++;
   }
@@ -226,8 +225,8 @@ _Accum divkD(_Accum x, _Accum y) {
 }
 #endif
 #ifdef DIVKS
-_Accum divkS(_Accum x, _Accum y) {
-  _Accum result;
+fix_t divkS(fix_t x, fix_t y) {
+  fix_t result;
   int i,j=0;
   int8_t sign = ((x < 0 && y < 0) || (y > 0 && x > 0)) ? 1 : 0;
   if(y == 0)
@@ -269,8 +268,8 @@ _Accum divkS(_Accum x, _Accum y) {
 #endif
 #ifdef LDIVLKD
 /* if y = 0, ldivlkD will enter an endless loop */
-_lAccum ldivlkD(_lAccum x, _lAccum y) {
-  _lAccum result;
+lfix_t ldivlkD(lfix_t x, lfix_t y) {
+  lfix_t result;
   int i,j=0;
   int8_t sign = ((x < 0 && y < 0) || (x > 0 && y > 0)) ? 1 : 0;
   x = labslk(x);
@@ -303,8 +302,8 @@ _lAccum ldivlkD(_lAccum x, _lAccum y) {
 }
 #endif
 #ifdef LDIVLKS
-_lAccum ldivlkS(_lAccum x, _lAccum y) {
-  _lAccum result;
+lfix_t ldivlkS(lfix_t x, lfix_t y) {
+  lfix_t result;
   int i,j=0;
   int8_t sign = ((x < 0 && y < 0) || (y > 0 && x > 0)) ? 1 : 0;
   if(y == 0)
@@ -345,10 +344,10 @@ _lAccum ldivlkS(_lAccum x, _lAccum y) {
 }
 #endif
 #ifdef SINCOSK
-_Accum sincosk(_Accum angle, _Accum* cosp)
+fix_t sincosk(fix_t angle, fix_t* cosp)
 {
-  _Accum x;
-  _Accum y = 0;
+  fix_t x;
+  fix_t y = 0;
   uint8_t correctionCount = 0;
   uint8_t quadrant = 1;
   if(cosp == NULL)
@@ -440,10 +439,10 @@ _Accum sincosk(_Accum angle, _Accum* cosp)
 }
 #endif
 #ifdef LSINCOSLK
-_lAccum lsincoslk(_lAccum angle, _lAccum* cosp)
+lfix_t lsincoslk(lfix_t angle, lfix_t* cosp)
 {
-  _lAccum x;
-  _lAccum y = 0;
+  lfix_t x;
+  lfix_t y = 0;
   uint8_t correctionCount;
   uint8_t quadrant = 1;
   if(cosp == NULL)
@@ -504,7 +503,7 @@ _lAccum lsincoslk(_lAccum angle, _lAccum* cosp)
 }
 #endif
 #ifdef LSINCOSK
-_lAccum lsincosk(_Accum angle, _lAccum* cosp)
+lfix_t lsincosk(fix_t angle, lfix_t* cosp)
 {
   uint8_t correctionCount = 0;
   /* move large values into [0,2 PI] */
@@ -567,7 +566,7 @@ _lAccum lsincosk(_Accum angle, _lAccum* cosp)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_sAccum roundskD(_sAccum f, uint8_t n)
+sfix_t roundskD(sfix_t f, uint8_t n)
 {
    n = SACCUM_FBIT - n;
    if(f >= 0) {
@@ -583,7 +582,7 @@ _sAccum roundskD(_sAccum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_Accum roundkD(_Accum f, uint8_t n)
+fix_t roundkD(fix_t f, uint8_t n)
 {
    n = ACCUM_FBIT - n;
    if(f >= 0) {
@@ -599,7 +598,7 @@ _Accum roundkD(_Accum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_sAccum roundskS(_sAccum f, uint8_t n)
+sfix_t roundskS(sfix_t f, uint8_t n)
 {
    if(n > SACCUM_FBIT) {
       return 0;
@@ -613,7 +612,7 @@ _sAccum roundskS(_sAccum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_Accum roundkS(_Accum f, uint8_t n)
+fix_t roundkS(fix_t f, uint8_t n)
 {
    if(n > ACCUM_FBIT) {
       return 0;
@@ -627,7 +626,7 @@ _Accum roundkS(_Accum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_lAccum roundlkD(_lAccum f, uint8_t n)
+lfix_t roundlkD(lfix_t f, uint8_t n)
 {
    n = LACCUM_FBIT - n;
    if(f >= 0) {
@@ -643,7 +642,7 @@ _lAccum roundlkD(_lAccum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-_Accum roundlkS(_lAccum f, uint8_t n)
+fix_t roundlkS(lfix_t f, uint8_t n)
 {
    if(n > LACCUM_FBIT) {
       return 0;
@@ -657,7 +656,7 @@ _Accum roundlkS(_lAccum f, uint8_t n)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-uint8_t countlssk(_sAccum f)
+uint8_t countlssk(sfix_t f)
 {
    int8_t i;
    uint8_t *pf = ((uint8_t*)&f) + 2;
@@ -675,7 +674,7 @@ uint8_t countlssk(_sAccum f)
  * using an uint8_t as second parameter according to
  * microcontroller register size and maximum possible value
  */
-uint8_t countlsk(_Accum f)
+uint8_t countlsk(fix_t f)
 {
    int8_t i;
    uint8_t *pf = ((uint8_t*)&f) + 3;
@@ -688,9 +687,9 @@ uint8_t countlsk(_Accum f)
 }
 #endif
 #ifdef TANKD
-_Accum tankD(_Accum angle)
+fix_t tankD(fix_t angle)
 {
-  _Accum sin, cos;
+  fix_t sin, cos;
   sin = sincosk(angle, &cos);
   if(absk(cos) <= 2)
      return (sin < 0 ? ACCUM_MIN : ACCUM_MAX);
@@ -698,9 +697,9 @@ _Accum tankD(_Accum angle)
 }
 #endif
 #ifdef TANKS
-_Accum tankS(_Accum angle)
+fix_t tankS(fix_t angle)
 {
-  _Accum sin, cos;
+  fix_t sin, cos;
   sin = sincosk(angle, &cos);
   if(absk(cos) <= 2)
      return (sin < 0 ? ACCUM_MIN : ACCUM_MAX);
@@ -708,9 +707,9 @@ _Accum tankS(_Accum angle)
 }
 #endif
 #ifdef LTANLKD
-_lAccum ltanlkD(_lAccum angle)
+lfix_t ltanlkD(lfix_t angle)
 {
-  _lAccum sin, cos;
+  lfix_t sin, cos;
   sin = lsincoslk(angle, &cos);
   if(absk(cos) <= 2)
      return (sin < 0 ? LACCUM_MIN : LACCUM_MAX);
@@ -718,9 +717,9 @@ _lAccum ltanlkD(_lAccum angle)
 }
 #endif
 #ifdef LTANLKS
-_lAccum ltanlkS(_lAccum angle)
+lfix_t ltanlkS(lfix_t angle)
 {
-  _lAccum sin, cos;
+  lfix_t sin, cos;
   sin = lsincoslk(angle, &cos);
   if(absk(cos) <= 2)
      return (sin < 0 ? LACCUM_MIN : LACCUM_MAX);
@@ -728,17 +727,17 @@ _lAccum ltanlkS(_lAccum angle)
 }
 #endif
 #ifdef LTANKD
-_lAccum ltankD(_Accum angle)
+lfix_t ltankD(fix_t angle)
 {
-  _lAccum sin, cos;
+  lfix_t sin, cos;
   sin = lsincosk(angle, &cos);
   return ldivlkD(sin, cos);
 }
 #endif
 #ifdef LTANKS
-_lAccum ltankS(_Accum angle)
+lfix_t ltankS(fix_t angle)
 {
-  _lAccum sin, cos;
+  lfix_t sin, cos;
   sin = lsincosk(angle, &cos);
   if(absk(cos) <= 2)
      return (sin < 0 ? LACCUM_MIN : LACCUM_MAX);
@@ -746,9 +745,9 @@ _lAccum ltankS(_Accum angle)
 }
 #endif
 #ifdef ATAN2K
-_Accum atan2kInternal(_Accum x, _Accum y)
+fix_t atan2kInternal(fix_t x, fix_t y)
 {
-  _Accum z = 0;
+  fix_t z = 0;
   uint8_t i = 0;
   uint8_t *px = ((uint8_t*)&x) + 3, *py = ((uint8_t*)&y) + 3;
   for(;!(*px & 0x60) && !(*py & 0x60) && i < 8;i++) {
@@ -763,7 +762,7 @@ _Accum atan2kInternal(_Accum x, _Accum y)
   }
 }
 
-_Accum atan2k(_Accum x, _Accum y)
+fix_t atan2k(fix_t x, fix_t y)
 {
   uint8_t signX, signY;
   if(y == 0)
@@ -789,10 +788,10 @@ _Accum atan2k(_Accum x, _Accum y)
 }
 #endif
 #ifdef LATAN2LK
-_lAccum latan2lk(_lAccum x, _lAccum y)
+lfix_t latan2lk(lfix_t x, lfix_t y)
 {
   uint8_t signX, signY;
-  _Accum z = 0;
+  fix_t z = 0;
   uint8_t *px = ((uint8_t*)&x) + 3, *py = ((uint8_t*)&y) + 3;
   if(y == 0)
      return 0;
@@ -835,14 +834,14 @@ _lAccum latan2lk(_lAccum x, _lAccum y)
  * Calculates the arctangent of y/x with output z. No correction has to be
  * done here.
  *
- * iterations is the fractal bit count (16 for _Accum, 24 for _lAccum)
+ * iterations is the fractal bit count (16 for fix_t, 24 for lfix_t)
  * and now the only variable, the execution time depends on.
  */
-void cordicck(_Accum* px, _Accum* py, _Accum* pz, uint8_t iterations, uint8_t mode)
+void cordicck(fix_t* px, fix_t* py, fix_t* pz, uint8_t iterations, uint8_t mode)
 {
   const unsigned long arctan[25] = {13176795, 7778716, 4110060, 2086331, 1047214, 524117, 262123, 131069, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
   register uint8_t i;
-  _Accum x, y, z, xH;
+  fix_t x, y, z, xH;
   x = *px;
   y = *py;
   z = *pz;
@@ -876,13 +875,13 @@ void cordicck(_Accum* px, _Accum* py, _Accum* pz, uint8_t iterations, uint8_t mo
  * Calculates the hyperbolic arctangent of y/x with output z. No correction
  * has to be done here.
  *
- * iterations is the fractal bit count (16 for _Accum, 24 for _lAccum)
+ * iterations is the fractal bit count (16 for fix_t, 24 for lfix_t)
  */
-void cordichk(_Accum* px, _Accum* py, _Accum* pz, uint8_t iterations, uint8_t mode)
+void cordichk(fix_t* px, fix_t* py, fix_t* pz, uint8_t iterations, uint8_t mode)
 {
   const unsigned long arctanh[24] = {9215828, 4285116, 2108178, 1049945, 524459, 262165, 131075, 65536, 32768, 16384, 8192, 4096, 2048, 1024, 512, 256, 128, 64, 32, 16, 8, 4, 2, 1};
   register uint8_t i, j;
-  _Accum x, y, z, xH;
+  fix_t x, y, z, xH;
   x = *px;
   y = *py;
   z = *pz;
@@ -909,9 +908,9 @@ void cordichk(_Accum* px, _Accum* py, _Accum* pz, uint8_t iterations, uint8_t mo
 }
 #endif
 #ifdef SQRT
-_Accum sqrtk_uncorrected(_Accum a, int8_t pow2, uint8_t cordic_steps)
+fix_t sqrtk_uncorrected(fix_t a, int8_t pow2, uint8_t cordic_steps)
 {
-  _Accum x, y, z;
+  fix_t x, y, z;
   if(a <= 0)
     return 0;
   /* The cordich method works only within [0.03, 2]
@@ -944,10 +943,10 @@ _Accum sqrtk_uncorrected(_Accum a, int8_t pow2, uint8_t cordic_steps)
 }
 #endif
 #ifdef LOGK
-_Accum logk(_Accum a)
+fix_t logk(fix_t a)
 {
   register int8_t pow2 = 8;
-  _Accum x, y, z;
+  fix_t x, y, z;
   if(a <= 0)
     return ACCUM_MIN;
   /* The cordic method works only within [1, 9]
@@ -967,10 +966,10 @@ _Accum logk(_Accum a)
 }
 #endif
 #ifdef LLOGLK
-_lAccum lloglk(_lAccum a)
+lfix_t lloglk(lfix_t a)
 {
   register int8_t pow2 = 0;
-  _Accum x, y, z;
+  fix_t x, y, z;
   if(a <= 0)
     return LACCUM_MIN;
   /* The cordic method works only within [1, 9]

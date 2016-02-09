@@ -32,7 +32,7 @@
 
 #if AVRFIX_CONFIG == AVR_CONFIG
 #define BYTE_ORDER BIG_ENDIAN
-#define LSHIFT_static(x, b) ((b) == 1 ? (x) + (x) : ((b) < 8 ? ((x) << (b)) : (x) * (1UL << (b))))
+#define LSHIFT_static(x, b) ((b) == 1 ? (x) + (x) : ((b) < 8 ? ((x) << (b)) : (x) * (1 << (b))))
 #define RSHIFT_static(x, b) ((x) >> (b))
 #define LSHIFT_dynamic(x, b) ((x) << (b))
 #define RSHIFT_dynamic(x, b) ((x) >> (b))
@@ -40,7 +40,7 @@
 
 
 /* Bunches of defines because compilation is fucky when not compiling as a static lib */
-/*
+
 #define SMULSKD
 #define SMULSKS
 #define SDIVSKD
@@ -48,18 +48,16 @@
 #define COUNTLSSK
 #define ROUNDSKD
 #define ROUNDSKS
-*/
 #define MULKD
 #define MULKS
-
 #define LMULLKD
-
 #define LMULLKS
-/*
+
 #define DIVKD
 #define DIVKS
 #define LDIVLKD
 #define LDIVLKS
+/*
 #define ROUNDKD
 #define ROUNDKS
 #define ROUNDLKD
@@ -85,6 +83,5 @@
 #define CORDICHSK
 #define SSINCOSSK
 */
-
 #endif /* _AVRFIX_CONFIG_H */
 
