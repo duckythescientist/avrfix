@@ -148,7 +148,7 @@ lfix_t ldivlkS(lfix_t, lfix_t);
 #endif
 
 /* Support Functions */
-/*
+
 #define mulikD(i,k) ktoi((i) * (k))
 #define mulilkD(i,lk) lktoi((i) * (lk))
 
@@ -192,7 +192,7 @@ lfix_t ldivlkS(lfix_t, lfix_t);
   #define idivk(a,b) idivkS((a),(b))
   #define idivlk(a,b) idivlkS((a),(b))
 #endif
-*/
+
 /* Abs Functions */
 
 #define sabssk(f)  ((f) < 0 ? (-(f)) : (f))
@@ -200,14 +200,14 @@ lfix_t ldivlkS(lfix_t, lfix_t);
 #define labslk(f) ((f) < 0 ? (-(f)) : (f))
 
 /* Rounding Functions */
-/*
-extern sfix_t roundskD(sfix_t f, uint8_t n);
-extern fix_t roundkD(fix_t f, uint8_t n);
-extern lfix_t roundlkD(lfix_t f, uint8_t n);
 
-extern sfix_t roundskS(sfix_t f, uint8_t n);
-extern fix_t roundkS(fix_t f, uint8_t n);
-extern lfix_t roundlkS(lfix_t f, uint8_t n);
+sfix_t roundskD(sfix_t f, uint8_t n);
+fix_t roundkD(fix_t f, uint8_t n);
+lfix_t roundlkD(lfix_t f, uint8_t n);
+
+sfix_t roundskS(sfix_t f, uint8_t n);
+fix_t roundkS(fix_t f, uint8_t n);
+lfix_t roundlkS(lfix_t f, uint8_t n);
 
 #if FX_ACCUM_OVERFLOW == DEFAULT
   #define roundsk(f, n) roundskD((f), (n))
@@ -218,19 +218,19 @@ extern lfix_t roundlkS(lfix_t f, uint8_t n);
   #define roundk(f, n) roundkS((f), (n))
   #define roundlk(f, n) roundlkS((f), (n))
 #endif
-*/
+
 /* countls Functions */
-/*
-extern uint8_t countlssk(sfix_t f);
-extern uint8_t countlsk(fix_t f);
+
+uint8_t countlssk(sfix_t f);
+uint8_t countlsk(fix_t f);
 #define countlslk(f) countlsk((f))
-*/
+
 /* Special Functions */
 
 #define CORDICC_GAIN 10188012
 #define CORDICH_GAIN 20258445
-/*
-extern fix_t sqrtk_uncorrected(fix_t,int8_t,uint8_t);
+
+fix_t sqrtk_uncorrected(fix_t,int8_t,uint8_t);
 
 #define sqrtkD(a)   mulkD(sqrtk_uncorrected(a, -8, 17), CORDICH_GAIN/256)
 #define lsqrtlkD(a) lmullkD(sqrtk_uncorrected(a, 0, 24), CORDICH_GAIN)
@@ -246,10 +246,10 @@ extern fix_t sqrtk_uncorrected(fix_t,int8_t,uint8_t);
   #define lsqrtlk(a) lsqrtlkS(a)
 #endif
 
-extern fix_t sincosk(fix_t, fix_t*);
-extern lfix_t lsincoslk(lfix_t, lfix_t*);
-extern lfix_t lsincosk(fix_t, lfix_t*);
-extern sfix_t ssincossk(sfix_t, sfix_t*);
+fix_t sincosk(fix_t, fix_t*);
+lfix_t lsincoslk(lfix_t, lfix_t*);
+lfix_t lsincosk(fix_t, lfix_t*);
+sfix_t ssincossk(sfix_t, sfix_t*);
 
 #define sink(a)   sincosk((a), NULL)
 #define lsinlk(a) lsincoslk((a), NULL)
@@ -261,13 +261,13 @@ extern sfix_t ssincossk(sfix_t, sfix_t*);
 #define lcosk(a)  lsink((a) + PIk/2 + 1)
 #define scossk(a) ssinsk((a) + PIsk/2)
 
-extern fix_t tankD(fix_t);
-extern lfix_t ltanlkD(lfix_t);
-extern lfix_t ltankD(fix_t);
+fix_t tankD(fix_t);
+lfix_t ltanlkD(lfix_t);
+lfix_t ltankD(fix_t);
 
-extern fix_t tankS(fix_t);
-extern lfix_t ltanlkS(lfix_t);
-extern lfix_t ltankS(fix_t);
+fix_t tankS(fix_t);
+lfix_t ltanlkS(lfix_t);
+lfix_t ltankS(fix_t);
 
 #if FX_ACCUM_OVERFLOW == DEFAULT
   #define tank(a) tankD((a))
@@ -279,14 +279,14 @@ extern lfix_t ltankS(fix_t);
   #define ltank(a) ltankS((a))
 #endif
 
-extern fix_t atan2k(fix_t, fix_t);
-extern lfix_t latan2lk(lfix_t, lfix_t);
+fix_t atan2k(fix_t, fix_t);
+lfix_t latan2lk(lfix_t, lfix_t);
 
 #define atank(a) atan2k(itok(1), (a))
 #define latanlk(a) latan2lk(itolk(1), (a))
 
-extern fix_t logk(fix_t);
-extern lfix_t lloglk(lfix_t);
+fix_t logk(fix_t);
+lfix_t lloglk(lfix_t);
 
 #define log2k(x) (divk(logk((x)), LOG2k))
 #define log10k(x) (divk(logk((x)), LOG10k))
@@ -295,7 +295,7 @@ extern lfix_t lloglk(lfix_t);
 #define llog2lk(x) (ldivlk(lloglk((x)), LOG2lk))
 #define llog10lk(x) (ldivlk(lloglk((x)), LOG10lk))
 #define llogalk(a, x) (ldivlk(lloglk((x)), lloglk((a))))
-*/
+
 
 #endif /* _AVRFIX_H */
 

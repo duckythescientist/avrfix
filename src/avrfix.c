@@ -204,7 +204,7 @@ fix_t divkD(fix_t x, fix_t y) {
     if (x >= ACCUM_MAX / 2) break;
     x = LSHIFT_static(x, 1);
   }
-  while((ul(y) & 1) == 0) {
+  while((y & 1) == 0) {
     y = RSHIFT_static(y, 1);
     j++;
   }
